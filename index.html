@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Feathers Example</title>
+</head>
+
+<body>
+    <h1>Welcome to Feathers</h1>
+    <p>Open up the console in your browser.</p>
+    <div id="listMessage"></div>
+    <input type="text" id="inputText">
+    <button value="" id="button" onclick="addMessage()">Submite</button>
+
+    <script src="https://unpkg.com/@feathersjs/client@^3.0.0/dist/feathers.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script type="text/javascript">
+        // Set up socket.io
+        const socket = io('http://localhost:3030');
+        // Set up Feathers client side
+        const app = feathers();
+
+        // Register socket.io
+        app.configure(feathers.socketio(socket));
+
+        // Get the messages service that talks to the server
+        const messages = app.service('messages');
+        // Log newly created messages
+        messages.on('created', message => {
+            var  listMessages =  document.querySelector('#listMessage');
+                 listMessages.innerHTML = listMessages.innerHTML+ "<h4>"+ message.text +"</h4>"
+            console.log('Someone created a messages', message);
+        });
+        // Create a new message and then get a list of all messages
+        messages.create({
+                text: 'Hello from the browser'
+            })
+            .then(() => messages.find())
+            .then(page => console.log('Messages', page));
+        function addMessage(){
+            var message = document.querySelector('#inputText').value;
+
+            console.log("hello form the  function add message");
+            messages.create({
+                text: message
+            })
+        }
+    </script>
+</body>
+
+</html>
